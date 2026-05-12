@@ -1,33 +1,32 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import type { Role } from '@/lib/types';
 
-export function RequireAuth({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+export function RequireRole({
+  roles,
+  children,
+}: {
+  roles: Role[];
+  children: ReactNode;
+}) {
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    }
-  }, [loading, user, router]);
+  if (!user) return null; // RequireAuth above us will handle the redirect
 
-  if (loading) {
-    return <CenteredMessage>Loading…</CenteredMessage>;
+  if (!roles.includes(user.role)) {
+    return (
+      <div className="mx-auto max-w-2xl px-6 py-12 text-center">
+        <h2 className="text-xl font-semibold text-gray-900">
+          You don&apos;t have access to this page
+        </h2>
+        <p className="mt-2 text-gray-600">
+          Your role ({user.role}) doesn&apos;t have permission to view this page.
+        </p>
+      </div>
+    );
   }
-  if (!user) {
-    // The effect will redirect; render nothing in the interim.
-    return null;
-  }
+
   return <>{children}</>;
-}
-
-function CenteredMessage({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center text-gray-500">
-      {children}
-    </div>
-  );
 }
