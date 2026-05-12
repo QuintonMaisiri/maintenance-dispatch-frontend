@@ -12,6 +12,8 @@ import { StatusBadge } from '@/components/status-badge';
 import { useAuth } from '@/lib/auth-context';
 import { AssignControl } from '@/components/assign-control';
 
+import { StatusControl } from '@/components/status-control';
+
 export default function RequestDetailPage() {
   return (
     <RequireAuth>
@@ -125,14 +127,24 @@ function Detail() {
       <p className="mt-4 text-xs text-gray-400">
         Last updated {new Date(request.updated_at).toLocaleString()}
       </p>
-      {user?.role === 'MANAGER' && (
+     {(user?.role === 'MANAGER' || user?.role === 'STAFF') && (
         <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="text-sm font-medium text-gray-700">Manager actions</h2>
-          <div className="mt-4">
-            <AssignControl
+          <h2 className="text-sm font-medium text-gray-700">
+            {user.role === 'MANAGER' ? 'Manager actions' : 'Staff actions'}
+          </h2>
+
+          <div className="mt-4 space-y-6">
+            <StatusControl
               request={request}
               onUpdated={(updated) => setRequest(updated)}
             />
+
+            {user.role === 'MANAGER' && (
+              <AssignControl
+                request={request}
+                onUpdated={(updated) => setRequest(updated)}
+              />
+            )}
           </div>
         </section>
       )}
