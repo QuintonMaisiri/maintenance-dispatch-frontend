@@ -9,6 +9,9 @@ import { RequireAuth } from '@/components/require-auth';
 import { TopNav } from '@/components/top-nav';
 import { StatusBadge } from '@/components/status-badge';
 
+import { useAuth } from '@/lib/auth-context';
+import { AssignControl } from '@/components/assign-control';
+
 export default function RequestDetailPage() {
   return (
     <RequireAuth>
@@ -23,6 +26,7 @@ export default function RequestDetailPage() {
 function Detail() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
+  const {user} = useAuth(); 
 
   const [request, setRequest] = useState<MaintenanceRequest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,6 +125,17 @@ function Detail() {
       <p className="mt-4 text-xs text-gray-400">
         Last updated {new Date(request.updated_at).toLocaleString()}
       </p>
+      {user?.role === 'MANAGER' && (
+        <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="text-sm font-medium text-gray-700">Manager actions</h2>
+          <div className="mt-4">
+            <AssignControl
+              request={request}
+              onUpdated={(updated) => setRequest(updated)}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 }
