@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: 'POST',
       body: { username, password },
     });
+    await primeCsrf(); // in case the cookie was rotated
     setUser(me);
   }, []);
 
@@ -79,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: 'POST',
       body: data,
     });
+    await primeCsrf(); // in case the cookie was rotated
     setUser(me);
   }, []);
 
